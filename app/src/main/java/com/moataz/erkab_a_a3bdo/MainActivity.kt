@@ -17,7 +17,7 @@ class MainActivity : AppCompatActivity() {
         binding.lifecycleOwner = this
         initNotification()
         displayCurrentTime()
-        displaySaveOrNot()
+        isTimeWithinRange(LocalTime.now())
     }
 
     private fun initNotification() {
@@ -30,17 +30,6 @@ class MainActivity : AppCompatActivity() {
         binding.timeTextView.text = currentTime
     }
 
-    private fun displaySaveOrNot() {
-        val currentTime = LocalTime.now()
-        if (isTimeWithinRange(currentTime)) {
-            binding.saveOrNotTextView.text = "أمان، إركب"
-            binding.saveOrNotTextView.setTextColor(binding.saveOrNotTextView.context.getColor(R.color.green))
-        } else {
-            binding.saveOrNotTextView.text = "مش أمان، أوعى تركب"
-            binding.saveOrNotTextView.setTextColor(binding.saveOrNotTextView.context.getColor(R.color.red))
-        }
-    }
-
     private fun getCurrentTimeUsingCalendar(): String {
         val calendar = Calendar.getInstance()
         val hour = calendar.get(Calendar.HOUR)
@@ -49,11 +38,17 @@ class MainActivity : AppCompatActivity() {
         return String.format("%02d:%02d", hour, minute)
     }
 
-    private fun isTimeWithinRange(currentTime: LocalTime): Boolean {
+    private fun isTimeWithinRange(currentTime: LocalTime) {
         val clockHead = currentTime.truncatedTo(ChronoUnit.HOURS)
         val startTime = clockHead.minusMinutes(11)
         val endTime = clockHead.plusMinutes(10)
 
-        return currentTime.isBefore(startTime) || currentTime.isAfter(endTime)
+        if (currentTime.isAfter(startTime)) {
+            binding.saveOrNotTextView.text = "مش أمان، أوعى تركب"
+            binding.saveOrNotTextView.setTextColor(binding.saveOrNotTextView.context.getColor(R.color.red))
+        } else if (currentTime.isAfter(endTime)) {
+            binding.saveOrNotTextView.text = "أمان، إركب"
+            binding.saveOrNotTextView.setTextColor(binding.saveOrNotTextView.context.getColor(R.color.green))
+        }
     }
 }
